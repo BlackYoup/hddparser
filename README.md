@@ -8,8 +8,4 @@ Just run :
 
 		node app.js
 		
-and it will output all of your files. (You may use sudo to read system files)
-
-##### Why don't use asynchronous functions and callbacks ? It's the power of node !!
-
-Well, yes but asynchronous wouldn't keep the file parsing order, simple as that.
+and it will output all of your files. (You may have to be root or run it with admin privileges to display all files)
