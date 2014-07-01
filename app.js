@@ -14,7 +14,11 @@ app.get('/list', function(req, res){
 		}
 	}).mapError(function(err){
 		console.log(err);
-		res.send(500);
+		if(err.error === 'unreadable'){
+			res.send(403, err.error);
+		} else{
+			res.send(500);
+		}		
 	});
 });
 

@@ -23,8 +23,8 @@ function Parser(){
 		
 		this.currentDir = dir = path.join(this.currentDir || '', dir);
 
-		return this.getDirFiles(dir).chainError(function(){
-			console.log('Couldn\'t read directory ' + dir);
+		return this.getDirFiles(dir).mapError(function(){
+			return {error: 'unreadable'};
 		}).chain(function(files){
 			return self.parseFiles(files, dir);
 		}).chain(function(allFilesStats){
@@ -62,8 +62,12 @@ function Parser(){
 	this.getDirFiles = function(dir){
 		var promise = new Promise();
 		fs.readdir(dir, function(err, files){
-			if(err) promise.reject(err);
-			else promise.resolve(files);
+			if(err) {
+				promise.reject(err);
+			} else {
+				files = _.union(['..'], files);
+				promise.resolve(files);
+			}
 		});
 		return promise;
 	};
