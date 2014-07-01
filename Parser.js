@@ -7,12 +7,23 @@ var fs = require('fs'),
 function Parser(){
 	var self = this;
 	
+	this.currentDir = null;
+	this.possibleDirs = null;
+	
 	this.readDir = function(dir){
 		if(!dir){
 			dir = this.defineRoot();
 		}
+		
+		if(this.possibleDirs && !_.contains(this.possibleDirs, dir)){
+			var p = new Promise();
+			p.resolve({error: 'Wrong folder name'});
+			return p;
+		}
+		
+		this.currentDir = dir = path.join(this.currentDir || '', dir);
 
-		this.getDirFiles(dir).chainError(function(){
+		return this.getDirFiles(dir).chainError(function(){
 			console.log('Couldn\'t read directory ' + dir);
 		}).chain(function(files){
 			return self.parseFiles(files, dir);
@@ -20,17 +31,32 @@ function Parser(){
 			return _.reduce(allFilesStats, function(p, fileInfos){
 				return p.append(fileInfos);
 			}, Promise.of([]));
-		}).map(function(arrFileInfos){
-			_.each(arrFileInfos, function(fileInfos){
+		}).chain(function(arrFileInfos){
+			var ret = _.map(arrFileInfos, function(fileInfos){
 				if(fileInfos.err){
-					console.log('Can\'t read ' + path.join(fileInfos.dir, fileInfos.file) + '. Error ' + fileInfos.error);
+					return {
+						type: 'error',
+						error: 'Can\'t get file name'
+					};
 				} else if(fileInfos.fileStats.isDirectory()){
-					self.readDir(path.join(fileInfos.dir, fileInfos.file));
+					return {
+						type: 'folder',
+						name: fileInfos.file
+					};
 				} else{
-					console.log(path.join(fileInfos.dir, fileInfos.file));
+					return {
+						type: 'file',
+						name: fileInfos.file
+					};
 				}
 			});
-		})
+			
+			self.possibleDirs = _.pluck(_.filter(ret, function(obj){
+				return obj.type === 'folder';
+			}), 'name');
+			
+			return Promise.of(ret);
+		});
 	};
 
 	this.getDirFiles = function(dir){
@@ -76,10 +102,6 @@ function Parser(){
 			break;
 		}
 		return ret;
-	};
-	
-	this.init = function(){
-		this.readDir();
 	};
 }
 
