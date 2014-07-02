@@ -12,20 +12,26 @@ function Parser(){
 	
 	this.readDir = function(dir){
 		if(!dir){
-			dir = this.defineRoot();
+			if(!this.currentDir){
+				dir = this.defineRoot();
+			} else{
+				dir = this.currentDir;
+			}
 		}
 		
-		if(this.possibleDirs && !_.contains(this.possibleDirs, dir)){
-			var p = new Promise();
-			p.resolve({error: 'Wrong folder name'});
-			return p;
+		if(this.currentDir !== dir){
+			if(this.possibleDirs && !_.contains(this.possibleDirs, dir)){
+				var p = new Promise();
+				p.resolve({error: 'Wrong folder name'});
+				return p;
+			}
+			dir = path.join(this.currentDir || '', dir);
 		}
 		
-		this.currentDir = dir = path.join(this.currentDir || '', dir);
-
 		return this.getDirFiles(dir).mapError(function(){
 			return {error: 'unreadable'};
 		}).chain(function(files){
+			self.currentDir = dir;
 			return self.parseFiles(files, dir);
 		}).chain(function(allFilesStats){
 			return _.reduce(allFilesStats, function(p, fileInfos){
