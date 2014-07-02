@@ -9,4 +9,4 @@ Just run :
 		npm install
 		node app.js
 		
-and it will output all of your files. (You may have to be root or run it with admin privileges to display all files)
+and it should open your browser on [http://127.0.0.1:3000](http://127.0.0.1:3000). From here, you will be able to fetch your hard drive.
