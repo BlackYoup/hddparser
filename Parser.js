@@ -22,7 +22,7 @@ function Parser(){
 		if(this.currentDir !== dir){
 			if(this.possibleDirs && !_.contains(this.possibleDirs, dir)){
 				var p = new Promise();
-				p.resolve({error: 'Wrong folder name'});
+				p.reject({error: 'wrong_folder_name'});
 				return p;
 			}
 			dir = path.join(this.currentDir || '', dir);
