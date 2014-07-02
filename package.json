@@ -4,6 +4,8 @@
   "description": "A HDD parser written in NodeJS",
   "main": "app.js",
   "dependencies": {
+    "express": "^4.4.5",
+    "open": "0.0.5",
     "pacta": "^0.5.0",
     "underscore": "^1.6.0"
   },
