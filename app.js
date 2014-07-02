@@ -1,7 +1,8 @@
 var express = require('express'),
 	app = express(),
 	Parser = require('./Parser.js'),
-	path = require('path');
+	path = require('path'),
+	open = require('open');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -15,8 +16,11 @@ app.get('/list', function(req, res){
 			res.send(400, err.error);
 		} else{
 			res.send(500);
-		}		
+		}
 	});
 });
 
-app.listen(3000);
+app.listen(3000, function(){
+	console.log('Your browser should be opened at "http://127.0.0.1:3000". If not, copy the given URL and paste it on your brower\'s bar');
+	open('http://127.0.0.1:3000');
+});
